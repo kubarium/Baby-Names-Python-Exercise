@@ -68,14 +68,15 @@ def main():
 
     matches = []
     for file in files:
-        extract_names(file)
-        #matches.append(extract_names(file))
+        matches.append(extract_names(file))
 
     if summary:
         summary_file = open(args[0], "w")
-        summary_file.write('\n'.join(matches) + '\n')
+        for match in matches:
+            summary_file.write('\n'.join(match) + '\n\n')
     else:
-        print('\n'.join(matches) + '\n')
+        for match in matches:
+            print('\n'.join(match) + '\n\n')
 
 
 
@@ -90,7 +91,7 @@ def extract_names(filename):
     names = {}
     for line in open(filename):
             rank_male_female = re.findall("<td>(\d*)</td><td>(\S*?)</td><td>(\S*?)</td>", line)
-            #since each line in html file is not of <td></td> format some tuples will be empty
+            #since each line in html file is not of <td></td> format some tuples will be empty but if not then
             if rank_male_female:
                 #register male and female rank
                 rank = rank_male_female[0][0]
@@ -101,15 +102,15 @@ def extract_names(filename):
                 names[female] = rank
 
             #while we are checking each line let's get the year value
-            year = re.findall('<h3 align="center">.*?(\d*)</h3>', line)
+            year = re.findall('Popularity in (\d*)', line)
             if year:
-                frequency.append(int(year[0]))
+                frequency.append(year[0])
 
     for v,k in names.items():
         frequency.append(v + " " + k)
 
 
-    print sorted(frequency)
+    return sorted(frequency)
 
 if __name__ == '__main__':
     main()
