@@ -8,6 +8,7 @@
 
 import sys
 import re
+from glob import glob
 
 """Baby Names exercise
 
@@ -51,32 +52,33 @@ def main():
         summary = True
         del args[0]
 
-    files = []
-    #If summary exists then there should at least be one file to process to export into summary
-    if summary:
-        files = args[1:]
-        if len(files) == 0:
-            print("your summary file will be empty since there is no file to process")
-            sys.exit(1)
-    else:
-        files = args
-
-
     # +++your code here+++
     # For each filename, get the names, then either print the text output
     # or write it to a summary file
+    files = glob(args[0])
 
-    matches = []
     for file in files:
-        matches.append(extract_names(file))
+        matches = linearize(extract_names(file))
 
-    if summary:
-        summary_file = open(args[0], "w")
-        for match in matches:
-            summary_file.write('\n'.join(match) + '\n\n')
-    else:
-        for match in matches:
-            print('\n'.join(match) + '\n\n')
+        if summary:
+            filename=file+".summary"
+
+            summary_file = open(filename, "w")
+            summary_file.write(matches)
+            print(filename)
+        else:
+            print(matches)
+
+
+def linearize(match):
+    """
+    Given a list it, return a string separated by a new line
+    2006
+    Aaliyah 91
+    Aaron 57
+    Abagail 895
+    """
+    return '\n'.join(match)
 
 
 
@@ -89,7 +91,8 @@ def extract_names(filename):
     # +++your code here+++
     frequency = []
     names = {}
-    for line in open(filename):
+
+    for line in open(filename) :
             rank_male_female = re.findall("<td>(\d*)</td><td>(\S*?)</td><td>(\S*?)</td>", line)
             #since each line in html file is not of <td></td> format some tuples will be empty but if not then
             if rank_male_female:
